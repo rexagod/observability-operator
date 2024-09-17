@@ -126,7 +126,7 @@ $(OC) oc: $(TOOLS_DIR)
 		[[ -f $(OC) ]] && exit 0 ;\
 		OS=$(shell go env GOOS) && ARCH=$(shell go env GOARCH) && \
 		curl -sSLo $(OC) https://mirror.openshift.com/pub/openshift-v4/$${ARCH}/clients/oc/latest/$${OS}/oc.tar.gz ;\
-		tar -xf $(TOOLS_DIR)/oc -C $(TOOLS_DIR) ;\
+		tar -xf $(TOOLS_DIR)/oc.tar.gz -C $(TOOLS_DIR) ;\
 		rm -f $(TOOLS_DIR)/README.md ;\
 		$(OC) version ;\
 		version=$(OC_VERSION) ;\
@@ -189,9 +189,10 @@ $(SHELLCHECK) shellcheck: $(TOOLS_DIR)
 		[[ -f $(SHELLCHECK) ]] && exit 0 ;\
 		cd $$(mktemp -d) ;\
 		OS=$(shell go env GOOS) && ARCH=$(shell uname -m) && \
-		curl -sSLo shellcheck-stable.tar.xz https://github.com/koalaman/shellcheck/releases/download/stable/shellcheck-stable.$${OS}.$${ARCH}.tar.xz ;\
+		if [[ "$$OS" == "darwin" && "$$ARCH" == "arm64" ]]; then ARCH="aarch64"; fi ;\
+		curl -sSLo shellcheck-stable.tar.xz https://github.com/koalaman/shellcheck/releases/download/v0.10.0/shellcheck-v0.10.0.$${OS}.$${ARCH}.tar.xz ;\
 		tar -xJf shellcheck-stable.tar.xz ;\
-		cp shellcheck-stable/shellcheck $(SHELLCHECK) ;\
+		cp shellcheck-v0.10.0/shellcheck $(SHELLCHECK) ;\
 		version=$(SHELLCHECK_VERSION) ;\
 		$(SHELLCHECK) -V | grep -q $${version##v} ;\
 	}
